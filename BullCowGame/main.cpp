@@ -2,12 +2,15 @@
 #include <string>
 #include "FBullCowGame.h"
 
+using FText = std::string;
+using int32 = int;
+
 void PrintIntro();
 void PlayGame();
 bool PromptToReplay();
-std::string GetGuess();
-constexpr int WORD_LENGTH = 9;
-constexpr int NUM_OF_TURNS = 3;
+FText GetGuess();
+constexpr int32 WORD_LENGTH = 9;
+constexpr int32 NUM_OF_TURNS = 3;
 
 FBullCowGame BCGame;
 
@@ -29,7 +32,8 @@ void PrintIntro()
 {
 	// introduce the game
 	std::cout << "Welcome to Bulls and Cows! Its a word game.\n";
-	std::cout << "Can you guess the " << WORD_LENGTH;
+	// world length variable has no relationship with actual word length
+	std::cout << "Can you guess the " << "6";
 	std::cout << " letter word I'm thinking of?\n";
 	std::cout << std::endl;
 	return;
@@ -37,15 +41,19 @@ void PrintIntro()
 
 void PlayGame()
 {
-	const int MaxTries = BCGame.GetMaxTries();
-	const int CurrentTry = BCGame.GetCurrentTry();
-	std::string Guess = "";
-	for (int i = 0; i < MaxTries; i++)
+	const int32 MaxTries = BCGame.GetMaxTries();
+	FText Guess = "";
+
+	for (int32 i = 0; i < MaxTries; i++)
 	{
+		int32 CurrentTry = BCGame.GetCurrentTry();
 		Guess = GetGuess();
+		// TODO validate guess
 		// repeat the guess back to user
 		std::cout << "Try " << CurrentTry << ". ";
-		std::cout << "Your guess is " << Guess << ".\n";
+		FBullCowCount BullCowCount = BCGame.SubmitGuess(Guess);
+		std::cout << "Bulls: " << BullCowCount.Bulls << ". ";
+		std::cout << "Cows: " << BullCowCount.Cows << ".";
 		std::cout << std::endl;
 	}
 }
@@ -53,20 +61,19 @@ void PlayGame()
 bool PromptToReplay()
 {
 	std::cout << "Play again (y/n)? ";
-	std::string Response = "";
+	FText Response = "";
 	std::getline(std::cin, Response);
 	std::cout << std::endl;
 	return (Response[0] == 'y') || (Response[0] == 'Y');
 }
 
 
-std::string GetGuess()
+FText GetGuess()
 {
 	std::cout << "Please enter your guess: ";
 	// get guess from user
-	std::string Guess = "";
+	FText Guess = "";
 	std::getline(std::cin, Guess);
-	std::cout << std::endl;
 
 	return Guess;
 }
