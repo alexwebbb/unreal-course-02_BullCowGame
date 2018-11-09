@@ -21,15 +21,33 @@ void FBullCowGame::Reset()
 
 int32 FBullCowGame::GetMaxTries() const {	return MyMaxTries; }
 int32 FBullCowGame::GetCurrentTry() const { return MyCurrentTry; }
+int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
 
 bool FBullCowGame::IsGameWon() const
 {
 	return false;
 }
 
-bool FBullCowGame::CheckGuessValidity(FString)
-{
-	return false;
+EWordStatus FBullCowGame::CheckGuessValidity(FString Guess) const
+{	
+	// if guess is not an isogram
+	if (false)
+	{
+
+	}
+	// if guess is not lowercase
+	else if (false)
+	{
+
+	}
+	// wrong length
+	else if (Guess.length() != GetHiddenWordLength())
+	{
+		return EWordStatus::Wrong_Length;
+	}
+	// otherwise
+	return EWordStatus::OK; // TODO set error codes
+	
 }
 
 // receives a valid guess, increments turn and returns count

@@ -8,8 +8,7 @@ using int32 = int;
 void PrintIntro();
 void PlayGame();
 bool PromptToReplay();
-FText GetGuess();
-constexpr int32 WORD_LENGTH = 9;
+FText GetValidGuess();
 constexpr int32 NUM_OF_TURNS = 3;
 
 FBullCowGame BCGame;
@@ -32,8 +31,7 @@ void PrintIntro()
 {
 	// introduce the game
 	std::cout << "Welcome to Bulls and Cows! Its a word game.\n";
-	// world length variable has no relationship with actual word length
-	std::cout << "Can you guess the " << "6";
+	std::cout << "Can you guess the " << BCGame.GetHiddenWordLength();
 	std::cout << " letter word I'm thinking of?\n";
 	std::cout << std::endl;
 	return;
@@ -47,7 +45,7 @@ void PlayGame()
 	for (int32 i = 0; i < MaxTries; i++)
 	{
 		int32 CurrentTry = BCGame.GetCurrentTry();
-		Guess = GetGuess();
+		Guess = GetValidGuess();
 		// TODO validate guess
 		// repeat the guess back to user
 		std::cout << "Try " << CurrentTry << ". ";
@@ -68,12 +66,33 @@ bool PromptToReplay()
 }
 
 
-FText GetGuess()
+FText GetValidGuess()
 {
+
 	std::cout << "Please enter your guess: ";
-	// get guess from user
+	EWordStatus Status = EWordStatus::Pending;
 	FText Guess = "";
-	std::getline(std::cin, Guess);
+	do
+	{
+		// get guess from user
+		std::getline(std::cin, Guess);
+		Status = BCGame.CheckGuessValidity(Guess);
+
+		switch (Status)
+		{
+		case EWordStatus::Not_Isogram:
+			break;
+		case EWordStatus::Not_Lowercase:
+			break;
+		case EWordStatus::Wrong_Length:
+			std::cout << "Please enter a " << BCGame.GetHiddenWordLength() << " letter word: ";
+			break;
+		default:
+			Status = EWordStatus::OK;
+		}
+
+	}
+	while (Status != EWordStatus::OK);
 
 	return Guess;
 }
