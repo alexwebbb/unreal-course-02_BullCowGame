@@ -1,4 +1,5 @@
 #include "FBullCowGame.h"
+#include <algorithm>
 #include <string>
 
 using FString = std::string;
@@ -16,38 +17,55 @@ void FBullCowGame::Reset()
 	MyCurrentTry = 1;
 	MyMaxTries = MAX_TRIES;
 	MyHiddenWord = HIDDEN_WORD;
+	bMyGameIsWon = false;
 	return;
 }
 
-int32 FBullCowGame::GetMaxTries() const {	return MyMaxTries; }
+int32 FBullCowGame::GetMaxTries() const { return MyMaxTries; }
 int32 FBullCowGame::GetCurrentTry() const { return MyCurrentTry; }
 int32 FBullCowGame::GetHiddenWordLength() const { return MyHiddenWord.length(); }
 
+FString FBullCowGame::NormalizeGuess(FString Guess) const
+{
+	int len = Guess.length();
+	FString LowerCaseGuess = Guess;
+
+	// Convert the string to lower case letters 
+	for (int i = 0; i < len; i++)
+	{
+		LowerCaseGuess[i] = tolower(Guess[i]);
+	}
+
+	return LowerCaseGuess;
+}
+
 bool FBullCowGame::IsGameWon() const
 {
-	return false;
+	return bMyGameIsWon;
 }
 
 EWordStatus FBullCowGame::CheckGuessValidity(FString Guess) const
-{	
-	// if guess is not an isogram
-	if (false)
-	{
+{
+	// check if a given string is isogram or not 
+	int len = Guess.length();
+	FString SortedGuess = Guess;
 
-	}
-	// if guess is not lowercase
-	else if (false)
+	std::sort(SortedGuess.begin(), SortedGuess.end());
+	for (int i = 0; i < len; i++)
 	{
+		if (SortedGuess[i] == SortedGuess[i + 1])
+			return EWordStatus::Not_Isogram;
+	}
 
-	}
-	// wrong length
-	else if (Guess.length() != GetHiddenWordLength())
+	// check if wrong length
+	if (Guess.length() != GetHiddenWordLength())
 	{
-		return EWordStatus::Wrong_Length;
+	return EWordStatus::Wrong_Length;
 	}
+
 	// otherwise
-	return EWordStatus::OK; // TODO set error codes
-	
+	return EWordStatus::OK;
+
 }
 
 // receives a valid guess, increments turn and returns count
@@ -76,7 +94,8 @@ FBullCowCount FBullCowGame::SubmitGuess(FString Guess)
 					// increment bulls if they are in the same place
 					BullCowCount.Bulls++;
 				}
-				else {
+				else
+				{
 					// increment cows if not
 					BullCowCount.Cows++;
 				}
@@ -85,5 +104,11 @@ FBullCowCount FBullCowGame::SubmitGuess(FString Guess)
 
 		}
 	}
+
+	if (BullCowCount.Bulls == HiddenWordLength)
+	{
+		bMyGameIsWon = true;
+	}
+
 	return BullCowCount;
 }

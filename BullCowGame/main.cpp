@@ -22,6 +22,7 @@ int main()
 		PrintIntro();
 		PlayGame();
 		bPlaying_Game = PromptToReplay();
+		BCGame.Reset();
 	}
 	while (bPlaying_Game);
 
@@ -42,17 +43,26 @@ void PlayGame()
 	const int32 MaxTries = BCGame.GetMaxTries();
 	FText Guess = "";
 
-	for (int32 i = 0; i < MaxTries; i++)
+	for (int32 i = 0; i < MaxTries && !BCGame.IsGameWon(); i++)
 	{
 		int32 CurrentTry = BCGame.GetCurrentTry();
+
 		Guess = GetValidGuess();
-		// TODO validate guess
 		// repeat the guess back to user
 		std::cout << "Try " << CurrentTry << ". ";
 		FBullCowCount BullCowCount = BCGame.SubmitGuess(Guess);
 		std::cout << "Bulls: " << BullCowCount.Bulls << ". ";
 		std::cout << "Cows: " << BullCowCount.Cows << ".";
 		std::cout << std::endl;
+	}
+
+	if (BCGame.IsGameWon())
+	{
+		std::cout << "You win! \\o/\n";
+	}
+	else
+	{
+		std::cout << "You lose...\n";
 	}
 }
 
@@ -76,13 +86,13 @@ FText GetValidGuess()
 	{
 		// get guess from user
 		std::getline(std::cin, Guess);
+		Guess = BCGame.NormalizeGuess(Guess);
 		Status = BCGame.CheckGuessValidity(Guess);
 
 		switch (Status)
 		{
 		case EWordStatus::Not_Isogram:
-			break;
-		case EWordStatus::Not_Lowercase:
+			std::cout << "Please enter a word with no repeated letters: ";
 			break;
 		case EWordStatus::Wrong_Length:
 			std::cout << "Please enter a " << BCGame.GetHiddenWordLength() << " letter word: ";
@@ -90,7 +100,6 @@ FText GetValidGuess()
 		default:
 			Status = EWordStatus::OK;
 		}
-
 	}
 	while (Status != EWordStatus::OK);
 
